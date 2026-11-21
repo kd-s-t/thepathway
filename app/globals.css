@@ -45,11 +45,11 @@ body {
   grid-template-rows: minmax(0, 1fr) auto;
   width: 100%;
   padding:
-    calc(var(--page-pad-y) + env(safe-area-inset-top, 0px))
-    calc(var(--page-pad-x) + env(safe-area-inset-right, 0px))
-    calc(var(--page-pad-y) + env(safe-area-inset-bottom, 0px))
-    calc(var(--page-pad-x) + env(safe-area-inset-left, 0px));
-  gap: clamp(0.6rem, 2vw, 0.85rem);
+    calc(0.75rem + env(safe-area-inset-top, 0px))
+    0
+    0
+    0;
+  gap: 0;
 }
 
 .path-main {
@@ -59,16 +59,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.path-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.55rem;
-  width: 100%;
-  max-width: 42rem;
-  margin: 0 auto;
+  padding-bottom: 0.5rem;
 }
 
 .path-status {
@@ -81,16 +72,40 @@ body {
 
 .path-stage {
   position: relative;
-  width: min(920px, 100%);
-  height: clamp(240px, 52dvh, 520px);
+  width: 100%;
+  height: clamp(320px, 62dvh, 640px);
   overflow: hidden;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
 }
 
 .path-curve {
   position: relative;
   width: 100%;
   height: 100%;
+}
+
+.path-arrow {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 3.1rem);
+  z-index: 30;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 0.45rem solid transparent;
+  border-right: 0.45rem solid transparent;
+  border-top: 0.7rem solid var(--mark);
+  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--mark) 55%, transparent));
+  pointer-events: none;
+}
+
+@media (min-width: 760px) {
+  .path-arrow {
+    top: calc(50% - 3.8rem);
+    border-left-width: 0.55rem;
+    border-right-width: 0.55rem;
+    border-top-width: 0.85rem;
+  }
 }
 
 .path-num {
@@ -100,7 +115,7 @@ body {
   box-sizing: border-box;
   font-family: var(--font-display);
   font-variant-numeric: tabular-nums;
-  font-size: clamp(1rem, 2.8vw, 1.9rem);
+  font-size: clamp(1.35rem, 3.6vw, 2.4rem);
   font-weight: 500;
   color: var(--muted);
   letter-spacing: 0.04em;
@@ -120,17 +135,19 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(0.25rem, 1.2vw, 0.45rem);
+  gap: clamp(0.4rem, 1.5vw, 0.75rem);
+  font-size: clamp(1.9rem, 5vw, 3.4rem);
   color: var(--ink);
   font-weight: 700;
   text-shadow:
-    0 0 28px color-mix(in srgb, var(--accent) 35%, transparent),
-    0 10px 30px rgba(0, 0, 0, 0.45);
+    0 0 40px color-mix(in srgb, var(--accent) 40%, transparent),
+    0 12px 36px rgba(0, 0, 0, 0.5);
 }
 
 .path-bracket {
   color: var(--mark);
   font-weight: 400;
+  font-size: 0.85em;
   opacity: 0.95;
 }
 
@@ -141,37 +158,32 @@ body {
 .trail {
   min-height: 0;
   max-height: 100%;
-  width: min(920px, 100%);
+  width: 100%;
   margin: 0 auto;
+  padding: 0 calc(var(--page-pad-x) + env(safe-area-inset-right, 0px)) 0 calc(var(--page-pad-x) + env(safe-area-inset-left, 0px));
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 0.75rem;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .trail-head {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 1rem;
 }
 
-.trail-kicker {
-  margin: 0;
-  color: var(--mark);
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+.history-view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
-.trail-title {
-  margin: 0.2rem 0 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 4vw, 2.2rem);
-  font-weight: 500;
-  letter-spacing: 0.03em;
-}
-
+.history-view-toggle button,
 .trail-close {
   appearance: none;
   border: 1px solid var(--line);
@@ -187,6 +199,13 @@ body {
   cursor: pointer;
 }
 
+.history-view-toggle button.is-active {
+  color: var(--ink);
+  border-color: var(--mark);
+  background: color-mix(in srgb, var(--mark) 16%, transparent);
+}
+
+.history-view-toggle button:hover,
 .trail-close:hover {
   color: var(--accent);
   border-color: var(--accent);
@@ -194,11 +213,6 @@ body {
 
 .trail-stage {
   min-height: 0;
-  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
-  border-radius: 1.25rem;
-  background:
-    radial-gradient(ellipse 70% 55% at 50% 0%, color-mix(in srgb, var(--mark) 16%, transparent), transparent 70%),
-    color-mix(in srgb, var(--bg) 70%, #000 30%);
   overflow: hidden;
 }
 
@@ -210,17 +224,9 @@ body {
 }
 
 .trail-grid {
-  stroke: color-mix(in srgb, var(--line) 45%, transparent);
+  stroke: color-mix(in srgb, var(--accent) 28%, transparent);
   stroke-width: 1;
   stroke-dasharray: 2 8;
-}
-
-.trail-axis {
-  fill: var(--muted);
-  font-size: 18px;
-  font-family: var(--font-ui);
-  text-anchor: middle;
-  letter-spacing: 0.04em;
 }
 
 .trail-path,
@@ -231,13 +237,13 @@ body {
 }
 
 .trail-path {
-  stroke-width: 3.5;
+  stroke-width: 4;
 }
 
 .trail-path-glow {
-  stroke: color-mix(in srgb, var(--mark) 70%, white 10%);
-  stroke-width: 10;
-  opacity: 0.35;
+  stroke: color-mix(in srgb, var(--accent) 85%, white 15%);
+  stroke-width: 12;
+  opacity: 0.45;
 }
 
 .trail-dot,
@@ -246,8 +252,8 @@ body {
 }
 
 .trail-dot {
-  fill: var(--mark);
-  stroke: color-mix(in srgb, var(--accent) 70%, white 10%);
+  fill: var(--accent);
+  stroke: var(--ink);
   stroke-width: 2;
 }
 
@@ -259,12 +265,12 @@ body {
 
 .trail-ring {
   fill: none;
-  stroke: color-mix(in srgb, var(--mark) 55%, transparent);
+  stroke: color-mix(in srgb, var(--accent) 70%, transparent);
   stroke-width: 1.5;
 }
 
 .trail-label {
-  fill: var(--muted);
+  fill: #d7b4b7;
   font-size: 28px;
   font-family: var(--font-display);
   text-anchor: middle;
@@ -277,51 +283,16 @@ body {
   font-weight: 700;
 }
 
-.trail-step {
-  fill: color-mix(in srgb, var(--muted) 70%, transparent);
-  font-size: 14px;
-  font-family: var(--font-ui);
-  text-anchor: middle;
-  letter-spacing: 0.12em;
-}
-
 .trail-dock {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 0.85rem;
   flex-wrap: wrap;
-  padding: 0.75rem 0.15rem 0.15rem;
-  border-top: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
+  padding: 0.35rem 0.15rem 0;
 }
 
-.trail-dock-meta {
-  min-width: 7rem;
-}
-
-.trail-dock-step {
-  margin: 0;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--mark);
-}
-
-.trail-dock-delta {
-  margin: 0.2rem 0 0;
-  color: var(--muted);
-  font-size: 0.85rem;
-}
-
-.trail-dock-actions,
-.trail-edit {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-}
-
-.trail-dock-value {
+.history-dock-number {
   margin: 0 0.35rem 0 0;
   font-family: var(--font-display);
   font-size: clamp(1.3rem, 3vw, 1.7rem);
@@ -329,7 +300,98 @@ body {
   color: var(--ink);
 }
 
-.trail-dock-actions button,
+.history-dock-date,
+.history-date {
+  color: var(--muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.history-dock-date {
+  margin: 0 0.55rem 0 0;
+}
+
+.history-actions-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  white-space: normal;
+  text-align: left;
+}
+
+.history-table-wrap {
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.history-table th,
+.history-table td {
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  vertical-align: middle;
+}
+
+.history-table th {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.history-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.history-table tbody tr.is-active {
+  background: color-mix(in srgb, var(--mark) 12%, transparent);
+}
+
+.history-index {
+  width: 3.5rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+}
+
+.history-number {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 3vw, 1.55rem);
+  cursor: pointer;
+}
+
+.history-table tr.is-active .history-number {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.history-number:hover {
+  color: var(--accent);
+}
+
+.history-actions {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.history-actions button,
 .trail-edit button {
   appearance: none;
   height: var(--control-h);
@@ -343,19 +405,27 @@ body {
   padding: 0 0.75rem;
   border-radius: 999px;
   cursor: pointer;
+  margin-left: 0.35rem;
 }
 
-.trail-dock-actions button:hover,
+.history-actions button:hover,
 .trail-edit button:hover {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.trail-dock-actions button:disabled,
+.history-actions button:disabled,
 .trail-edit button:disabled,
 .trail-edit input:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+.trail-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
 .trail-edit input {
@@ -376,111 +446,151 @@ body {
   border-color: var(--accent);
 }
 
-.path-add,
-.path-nav {
+.glass-chrome {
+  position: relative;
+  z-index: 20;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
+  gap: 0.55rem;
   width: 100%;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding:
+    0.55rem
+    calc(0.85rem + env(safe-area-inset-right, 0px))
+    calc(0.65rem + env(safe-area-inset-bottom, 0px))
+    calc(0.85rem + env(safe-area-inset-left, 0px));
 }
 
-.path-add input {
-  width: clamp(5.5rem, 28vw, 6.5rem);
-  height: var(--control-h);
-  border: 1px solid var(--line);
+.glass-add,
+.glass-nav {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid color-mix(in srgb, #fff 18%, transparent);
+  border-radius: 1.35rem;
+  background: color-mix(in srgb, #3a1a1e 42%, transparent);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 color-mix(in srgb, #fff 22%, transparent);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+}
+
+.glass-add {
+  padding: 0.35rem;
+}
+
+.glass-add input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 2.35rem;
+  border: 0;
   background: transparent;
   color: var(--ink);
   font: inherit;
   font-variant-numeric: tabular-nums;
-  font-size: 0.8rem;
-  padding: 0 0.7rem;
-  border-radius: 999px;
+  font-size: 0.95rem;
+  padding: 0 0.85rem;
   outline: none;
 }
 
-.path-add input::placeholder {
-  color: var(--muted);
+.glass-add input::placeholder {
+  color: color-mix(in srgb, var(--muted) 85%, transparent);
 }
 
-.path-add input:focus {
-  border-color: var(--accent);
-}
-
-.path-add button,
-.path-nav button {
+.glass-add button {
   appearance: none;
-  height: var(--control-h);
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--ink);
+  flex: 0 0 auto;
+  height: 2.35rem;
+  border: 0;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--mark) 78%, #fff 8%);
+  color: #fff;
   font: inherit;
-  font-size: 0.7rem;
-  letter-spacing: 0.06em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 0 0.8rem;
-  border-radius: 999px;
+  padding: 0 1rem;
   cursor: pointer;
-  white-space: nowrap;
 }
 
-.path-add button {
-  border-color: var(--mark);
-  background: color-mix(in srgb, var(--mark) 18%, transparent);
-}
-
-.path-add button:disabled,
-.path-nav button:disabled {
-  opacity: 0.35;
+.glass-add button:disabled {
+  opacity: 0.4;
   cursor: default;
 }
 
-.path-add button:not(:disabled):hover,
-.path-nav button:not(:disabled):hover {
-  border-color: var(--accent);
-  color: var(--accent);
+.glass-nav {
+  padding: 0.3rem;
+}
+
+.glass-item {
+  appearance: none;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 2.55rem;
+  border: 0;
+  border-radius: 1.05rem;
+  background: transparent;
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.glass-item.is-active {
+  color: var(--ink);
+  background: color-mix(in srgb, #fff 16%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 20%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, #fff 10%, transparent);
+}
+
+.glass-item:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.glass-item:not(:disabled):hover {
+  color: var(--ink);
 }
 
 .path-error {
   margin: 0;
   text-align: center;
-  color: var(--mark);
+  color: var(--accent);
   font-size: 0.8rem;
-  padding: 0 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--mark) 22%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 @media (max-width: 520px) {
-  :root {
-    --control-h: 2.15rem;
+  .history-table th,
+  .history-table td {
+    padding: 0.7rem 0.75rem;
   }
 
-  .path-add button,
-  .path-nav button {
-    font-size: 0.68rem;
-    padding: 0 0.7rem;
-  }
-
-  .trail-dock {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .trail-label {
-    font-size: 22px;
-  }
-
-  .trail-node.is-focus .trail-label {
-    font-size: 28px;
+  .history-actions button {
+    margin-left: 0.25rem;
+    padding: 0 0.55rem;
   }
 }
 
 @media (max-width: 380px) {
-  .path-controls {
-    gap: 0.45rem;
-  }
-
   .path-num.is-active {
     gap: 0.2rem;
+  }
+
+  .glass-item {
+    font-size: 0.64rem;
   }
 }

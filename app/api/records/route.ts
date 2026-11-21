@@ -1,4 +1,5 @@
 import {
+  createRecord,
   parseRecordValue,
   readRecords,
   writeRecords,
@@ -48,9 +49,9 @@ export async function POST(request: Request) {
       ? (body as { value: unknown }).value
       : body;
 
-  let record: number;
+  let recordValue: number;
   try {
-    record = parseRecordValue(value);
+    recordValue = parseRecordValue(value);
   } catch (error) {
     return Response.json(
       { error: error instanceof Error ? error.message : "Invalid record" },
@@ -59,10 +60,11 @@ export async function POST(request: Request) {
   }
 
   const records = await readRecords();
-  records.push(record);
+  const added = createRecord(recordValue);
+  records.push(added);
   await writeRecords(records);
 
-  return Response.json({ records, added: record });
+  return Response.json({ records, added });
 }
 
 export async function PATCH(request: Request) {
@@ -89,7 +91,10 @@ export async function PATCH(request: Request) {
 
   try {
     const index = parseIndex(rawIndex, records.length);
-    records[index] = parseRecordValue(value);
+    records[index] = {
+      ...records[index],
+      value: parseRecordValue(value),
+    };
   } catch (error) {
     return Response.json(
       { error: error instanceof Error ? error.message : "Invalid update" },

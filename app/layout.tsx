@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "The Pathway",
-  description: "A path from 1 to 1000, driven by your records.",
+  description: "A path from 1 to 999, driven by your records.",
 };
 
 export const viewport: Viewport = {

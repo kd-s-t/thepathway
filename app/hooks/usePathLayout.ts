@@ -9,9 +9,9 @@ export type PathLayout = {
 };
 
 const DEFAULT_LAYOUT: PathLayout = {
-  spacing: 160,
-  window: 10,
-  curve: 0.01,
+  spacing: 120,
+  window: 2,
+  curve: 0.02,
 };
 
 export function usePathLayout(
@@ -24,16 +24,14 @@ export function usePathLayout(
     if (!node) return;
 
     const update = () => {
-      const width = Math.min(node.clientWidth || window.innerWidth, 920);
-      const spacing =
-        width < 380 ? 64 : width < 520 ? 78 : width < 760 ? 104 : width < 920 ? 132 : 160;
-      const visible = Math.max(3, Math.floor(width / spacing));
-      const side = Math.max(2, Math.floor((visible - 1) / 2));
+      const width = node.clientWidth || window.innerWidth;
+      // 5 numbers: center + ±1 fully in view, ±2 sit on the edge and crop.
+      const spacing = Math.max(72, Math.floor(width / 4));
 
       setLayout({
         spacing,
-        window: Math.min(10, side),
-        curve: width < 520 ? 0.006 : width < 760 ? 0.008 : 0.01,
+        window: 2,
+        curve: 0.02,
       });
     };
 
