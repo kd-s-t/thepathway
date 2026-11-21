@@ -1,7 +1,12 @@
-export default function Home() {
+import { readRecords } from "@/lib/records";
+import PathReel from "./components/PathReel";
+
+export default async function Home() {
+  const records = await readRecords();
+
   return (
     <main>
-      <div>Hello world!</div>
+      <PathReel initialRecords={records} />
     </main>
   );
 }
