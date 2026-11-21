@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValueEvent, useSpring } from "framer-motion";
+import { animate, useMotionValue, useMotionValueEvent } from "framer-motion";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { usePathLayout } from "../hooks/usePathLayout";
 import MapHistory from "./MapHistory";
@@ -29,22 +29,39 @@ export default function PathReel({ initialRecords }: PathReelProps) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/records")
+      .then((response) => response.json())
+      .then((data: RecordsResponse) => {
+        if (cancelled || !data.records) return;
+        setRecords(data.records);
+        setIndex(data.records.length > 0 ? data.records.length - 1 : 0);
+      })
+      .catch(() => {
+        // Keep bundled initial records if live sync fails.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const safeIndex =
     records.length === 0 ? 0 : Math.min(index, records.length - 1);
 
   const target =
     records.length > 0 ? clamp(records[safeIndex], 1, PATH_MAX) : 1;
 
-  const display = useSpring(target, {
-    stiffness: 52,
-    damping: 18,
-    mass: 0.85,
-  });
-
+  const display = useMotionValue(target);
   const [value, setValue] = useState(target);
 
   useEffect(() => {
-    display.set(target);
+    const controls = animate(display, target, {
+      type: "tween",
+      duration: 0.85,
+      ease: [0.22, 1, 0.36, 1],
+    });
+    return () => controls.stop();
   }, [display, target]);
 
   useMotionValueEvent(display, "change", setValue);
@@ -168,7 +185,7 @@ export default function PathReel({ initialRecords }: PathReelProps) {
                 const rotate = offset * 0.55;
 
                 return (
-                  <motion.span
+                  <span
                     key={n}
                     className={[
                       "path-num",
@@ -178,16 +195,13 @@ export default function PathReel({ initialRecords }: PathReelProps) {
                       .filter(Boolean)
                       .join(" ")}
                     style={{
-                      x,
-                      y,
-                      opacity,
-                      rotate,
-                      width: spacing,
+                      position: "absolute",
                       left: "50%",
-                      top: "46%",
-                      marginLeft: -spacing / 2,
-                      marginTop: "-0.5em",
+                      top: "50%",
+                      width: spacing,
+                      opacity,
                       zIndex: isActive ? 20 : Math.round(20 - distance),
+                      transform: `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${rotate}deg)`,
                     }}
                   >
                     {isActive ? (
@@ -203,7 +217,7 @@ export default function PathReel({ initialRecords }: PathReelProps) {
                     ) : (
                       n
                     )}
-                  </motion.span>
+                  </span>
                 );
               })}
             </div>

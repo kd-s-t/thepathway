@@ -2,7 +2,12 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 
 export const PATH_MAX = 1000;
-export const RECORDS_PATH = path.join(process.cwd(), "data", "records.json");
+
+const SEED_PATH = path.join(process.cwd(), "data", "records.json");
+const RUNTIME_PATH =
+  process.env.VERCEL === "1"
+    ? path.join("/tmp", "thepathway-records.json")
+    : SEED_PATH;
 
 export type RecordsFile = {
   records: number[];
@@ -22,14 +27,29 @@ export function normalizeRecords(input: unknown): number[] {
   );
 }
 
-export async function readRecords(): Promise<number[]> {
-  const raw = await fs.readFile(RECORDS_PATH, "utf8");
+async function readJsonFile(filePath: string): Promise<number[]> {
+  const raw = await fs.readFile(filePath, "utf8");
   return normalizeRecords(JSON.parse(raw) as unknown);
+}
+
+export async function readRecords(): Promise<number[]> {
+  try {
+    return await readJsonFile(RUNTIME_PATH);
+  } catch {
+    if (RUNTIME_PATH === SEED_PATH) throw new Error("Could not read records");
+    const seeded = await readJsonFile(SEED_PATH);
+    await writeRecords(seeded);
+    return seeded;
+  }
 }
 
 export async function writeRecords(records: number[]): Promise<number[]> {
   const next: RecordsFile = { records };
-  await fs.writeFile(RECORDS_PATH, `${JSON.stringify(next, null, 2)}\n`, "utf8");
+  await fs.writeFile(
+    RUNTIME_PATH,
+    `${JSON.stringify(next, null, 2)}\n`,
+    "utf8",
+  );
   return records;
 }
 

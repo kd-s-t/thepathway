@@ -33,11 +33,16 @@ body {
     var(--bg);
 }
 
+.path-root {
+  min-height: 100dvh;
+  min-height: 100svh;
+}
+
 .path-shell {
   min-height: 100dvh;
   min-height: 100svh;
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: minmax(0, 1fr) auto;
   width: 100%;
   padding:
     calc(var(--page-pad-y) + env(safe-area-inset-top, 0px))
@@ -50,8 +55,10 @@ body {
 .path-main {
   min-height: 0;
   width: 100%;
-  display: grid;
-  place-items: center;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .path-controls {
@@ -74,22 +81,22 @@ body {
 
 .path-stage {
   position: relative;
-  min-height: 0;
-  width: 100%;
-  max-width: 920px;
-  display: grid;
-  place-items: center;
+  width: min(920px, 100%);
+  height: clamp(240px, 52dvh, 520px);
   overflow: hidden;
+  flex: 0 0 auto;
 }
 
 .path-curve {
   position: relative;
   width: 100%;
-  height: clamp(220px, 48dvh, 520px);
+  height: 100%;
 }
 
 .path-num {
   position: absolute;
+  left: 50%;
+  top: 50%;
   box-sizing: border-box;
   font-family: var(--font-display);
   font-variant-numeric: tabular-nums;
@@ -131,201 +138,242 @@ body {
   min-width: 3ch;
 }
 
-.map-panel {
+.trail {
   min-height: 0;
   max-height: 100%;
-  overflow: auto;
-  overscroll-behavior: contain;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: min(640px, 100%);
+  width: min(920px, 100%);
   margin: 0 auto;
-  padding: 0.25rem;
-  -webkit-overflow-scrolling: touch;
-}
-
-.map-panel-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 0.75rem;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: blur(8px);
-  padding: 0.25rem 0;
+  overflow: hidden;
 }
 
-.map-panel-title {
+.trail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.trail-kicker {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.05rem, 3vw, 1.25rem);
-  letter-spacing: 0.04em;
+  color: var(--mark);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
-.map-close {
+.trail-title {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.trail-close {
   appearance: none;
   border: 1px solid var(--line);
   background: transparent;
   color: var(--muted);
   font: inherit;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   height: var(--control-h);
+  padding: 0 0.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.trail-close:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.trail-stage {
+  min-height: 0;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 0%, color-mix(in srgb, var(--mark) 16%, transparent), transparent 70%),
+    color-mix(in srgb, var(--bg) 70%, #000 30%);
+  overflow: hidden;
+}
+
+.trail-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: clamp(220px, 42dvh, 420px);
+}
+
+.trail-grid {
+  stroke: color-mix(in srgb, var(--line) 45%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 2 8;
+}
+
+.trail-axis {
+  fill: var(--muted);
+  font-size: 18px;
+  font-family: var(--font-ui);
+  text-anchor: middle;
+  letter-spacing: 0.04em;
+}
+
+.trail-path,
+.trail-path-glow {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trail-path {
+  stroke-width: 3.5;
+}
+
+.trail-path-glow {
+  stroke: color-mix(in srgb, var(--mark) 70%, white 10%);
+  stroke-width: 10;
+  opacity: 0.35;
+}
+
+.trail-dot,
+.trail-label {
+  cursor: pointer;
+}
+
+.trail-dot {
+  fill: var(--mark);
+  stroke: color-mix(in srgb, var(--accent) 70%, white 10%);
+  stroke-width: 2;
+}
+
+.trail-node.is-focus .trail-dot {
+  fill: var(--ink);
+  stroke: var(--mark);
+  stroke-width: 3;
+}
+
+.trail-ring {
+  fill: none;
+  stroke: color-mix(in srgb, var(--mark) 55%, transparent);
+  stroke-width: 1.5;
+}
+
+.trail-label {
+  fill: var(--muted);
+  font-size: 28px;
+  font-family: var(--font-display);
+  text-anchor: middle;
+  font-variant-numeric: tabular-nums;
+}
+
+.trail-node.is-focus .trail-label {
+  fill: var(--ink);
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.trail-step {
+  fill: color-mix(in srgb, var(--muted) 70%, transparent);
+  font-size: 14px;
+  font-family: var(--font-ui);
+  text-anchor: middle;
+  letter-spacing: 0.12em;
+}
+
+.trail-dock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 0.15rem 0.15rem;
+  border-top: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
+}
+
+.trail-dock-meta {
+  min-width: 7rem;
+}
+
+.trail-dock-step {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mark);
+}
+
+.trail-dock-delta {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.trail-dock-actions,
+.trail-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.trail-dock-value {
+  margin: 0 0.35rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.trail-dock-actions button,
+.trail-edit button {
+  appearance: none;
+  height: var(--control-h);
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   padding: 0 0.75rem;
   border-radius: 999px;
   cursor: pointer;
 }
 
-.map-close:hover {
-  color: var(--accent);
+.trail-dock-actions button:hover,
+.trail-edit button:hover {
   border-color: var(--accent);
-}
-
-.map-list {
-  list-style: none;
-  margin: 0;
-  padding: 0.25rem 0 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  font-family: var(--font-display);
-}
-
-.map-step {
-  width: 100%;
-}
-
-.map-line {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: clamp(0.4rem, 2vw, 0.75rem);
-  padding: 0.35rem 0;
-  color: var(--muted);
-}
-
-.map-item {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-  min-width: min(5.5rem, 28vw);
-}
-
-.map-value {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-variant-numeric: tabular-nums;
-  font-size: clamp(1.15rem, 3.5vw, 1.9rem);
-  letter-spacing: 0.04em;
-  min-width: 4.5ch;
-  text-align: center;
-  padding: 0;
-  cursor: pointer;
-}
-
-.map-line.is-active .map-value {
-  color: var(--ink);
-  font-weight: 700;
-}
-
-.map-value:hover {
   color: var(--accent);
 }
 
-.map-actions {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.map-actions button,
-.map-edit button {
-  appearance: none;
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--muted);
-  font: inherit;
-  font-size: 0.65rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  min-height: 1.6rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-  cursor: pointer;
-}
-
-.map-actions button:hover,
-.map-edit button:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-.map-actions button:disabled,
-.map-edit button:disabled,
-.map-edit input:disabled {
+.trail-dock-actions button:disabled,
+.trail-edit button:disabled,
+.trail-edit input:disabled {
   opacity: 0.4;
   cursor: default;
 }
 
-.map-edit {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.map-edit input {
-  width: 5rem;
+.trail-edit input {
+  width: 5.5rem;
+  height: var(--control-h);
   border: 1px solid var(--line);
   background: transparent;
   color: var(--ink);
   font: inherit;
   font-variant-numeric: tabular-nums;
-  font-size: 0.95rem;
-  padding: 0.3rem 0.5rem;
+  font-size: 0.9rem;
+  padding: 0 0.65rem;
   border-radius: 999px;
   outline: none;
 }
 
-.map-edit input:focus {
+.trail-edit input:focus {
   border-color: var(--accent);
-}
-
-.map-rail {
-  flex: 1 1 auto;
-  min-width: 1.5rem;
-  height: 0;
-  border-top: 1px solid color-mix(in srgb, var(--mark) 80%, transparent);
-}
-
-.map-join {
-  width: 1px;
-  height: 1.25rem;
-  background: color-mix(in srgb, var(--mark) 80%, transparent);
-}
-
-.map-step:has(> .map-line.is-left) > .map-join {
-  margin-left: auto;
-  margin-right: 2.1ch;
-}
-
-.map-step:has(> .map-line.is-right) > .map-join {
-  margin-left: 2.1ch;
-  margin-right: auto;
 }
 
 .path-add,
@@ -413,16 +461,17 @@ body {
     padding: 0 0.7rem;
   }
 
-  .map-item {
-    min-width: 4.75rem;
+  .trail-dock {
+    align-items: stretch;
+    flex-direction: column;
   }
 
-  .map-step:has(> .map-line.is-left) > .map-join {
-    margin-right: 1.4ch;
+  .trail-label {
+    font-size: 22px;
   }
 
-  .map-step:has(> .map-line.is-right) > .map-join {
-    margin-left: 1.4ch;
+  .trail-node.is-focus .trail-label {
+    font-size: 28px;
   }
 }
 
