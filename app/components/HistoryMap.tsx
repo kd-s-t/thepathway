@@ -71,7 +71,7 @@ export default function HistoryMap({
   useMotionValueEvent(progress, "change", setDrawn);
 
   return (
-    <div className="trail-stage">
+    <div className="trail-canvas">
       <svg
         className="trail-svg"
         viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}

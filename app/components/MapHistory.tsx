@@ -60,39 +60,15 @@ export default function MapHistory({
 
   return (
     <div className="trail" role="dialog" aria-label="History">
-      <header className="trail-head">
-        <div className="history-view-toggle" role="group" aria-label="History view">
-          <button
-            type="button"
-            className={view === "table" ? "is-active" : undefined}
-            onClick={() => setView("table")}
-          >
-            Table
-          </button>
-          <button
-            type="button"
-            className={view === "map" ? "is-active" : undefined}
-            onClick={() => setView("map")}
-          >
-            Map
-          </button>
-          <button type="button" className="trail-close" onClick={onClose}>
-            Close
-          </button>
-        </div>
-      </header>
-
       {records.length === 0 ? (
         <p className="path-status">No records yet.</p>
       ) : view === "map" ? (
-        <>
-          <HistoryMap
-            records={records}
-            focus={Math.min(focus, records.length - 1)}
-            onFocus={setFocus}
-            onSelect={onSelect}
-          />
-        </>
+        <HistoryMap
+          records={records}
+          focus={Math.min(focus, records.length - 1)}
+          onFocus={setFocus}
+          onSelect={onSelect}
+        />
       ) : (
         <div className="history-table-wrap">
           <table className="history-table">
@@ -185,6 +161,26 @@ export default function MapHistory({
           </table>
         </div>
       )}
+
+      <div className="history-view-toggle" role="group" aria-label="History view">
+        <button
+          type="button"
+          className={view === "table" ? "is-active" : undefined}
+          onClick={() => setView("table")}
+        >
+          Table
+        </button>
+        <button
+          type="button"
+          className={view === "map" ? "is-active" : undefined}
+          onClick={() => setView("map")}
+        >
+          Map
+        </button>
+        <button type="button" className="trail-close" onClick={onClose}>
+          Close
+        </button>
+      </div>
     </div>
   );
 }

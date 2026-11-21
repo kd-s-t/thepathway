@@ -94,7 +94,7 @@ body {
   transform: translateX(-50%);
   border-left: 0.45rem solid transparent;
   border-right: 0.45rem solid transparent;
-  border-top: 0.7rem solid var(--mark);
+  border-bottom: 0.7rem solid var(--mark);
   filter: drop-shadow(0 0 10px color-mix(in srgb, var(--mark) 55%, transparent));
   pointer-events: none;
 }
@@ -104,7 +104,7 @@ body {
     top: calc(50% - 3.8rem);
     border-left-width: 0.55rem;
     border-right-width: 0.55rem;
-    border-top-width: 0.85rem;
+    border-bottom-width: 0.85rem;
   }
 }
 
@@ -162,25 +162,19 @@ body {
   margin: 0 auto;
   padding: 0 calc(var(--page-pad-x) + env(safe-area-inset-right, 0px)) 0 calc(var(--page-pad-x) + env(safe-area-inset-left, 0px));
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: 0.75rem;
   overflow: hidden;
   box-sizing: border-box;
 }
 
-.trail-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-
 .history-view-toggle {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.35rem;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  padding: 0.25rem 0 0.5rem;
 }
 
 .history-view-toggle button,
@@ -211,9 +205,14 @@ body {
   border-color: var(--accent);
 }
 
-.trail-stage {
+.trail-canvas {
   min-height: 0;
-  overflow: hidden;
+  width: 100%;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
 }
 
 .trail-svg {
